@@ -5,7 +5,7 @@
 // Адекватный, читабельный, красивый пользовательский интерфейс.
 
 // Меню
-// 1) Ввод                                                        +
+// 1) Ввод																											  +
 // 2) Вывод                                                                                                           + 
 // 3) Выбрать запись для изменения, только одно поле																  + 
 // 4) Поиск по имени(все приводить к одному регистру!)																  +
@@ -19,12 +19,12 @@
 #include <Windows.h>
 
 int menu();
-int inputData(struct customer data[],int counter);
-void outputData(struct customer data[], int counter);
-int deleteData(struct customer data[], int counter);
-void changeData(struct customer data[], int counter);
-void sortData(struct customer data[], int counter);
-void findData(struct customer data[], int counter);
+int inputData(struct customer *data,int counter);
+void outputData(struct customer *data, int counter);
+int deleteData(struct customer *data, int counter);
+void changeData(struct customer *data, int counter);
+void sortData(struct customer *data, int counter);
+void findData(struct customer *data, int counter);
 
 struct customer {
 	char name[20];
@@ -36,7 +36,7 @@ struct customer {
 
 int main() {
 	int counter = 0;
-	struct customer data[30];
+	struct customer *data = malloc(sizeof(struct customer));
 	while (1)
 	{
 		switch (menu())
@@ -56,6 +56,7 @@ int main() {
 			system("CLS");
 		}
 	}
+	free(data);
 }
 
 int menu() {
@@ -73,36 +74,30 @@ int menu() {
 	return menuInput;
 }
 
-int inputData(struct customer data[], int counter) {
+int inputData(struct customer *data, int counter) {
 	system("CLS");
-	if (counter < 30) {
+	rewind(stdin);
+	printf("Record number %d\n", counter+1);
+	printf("\nInput name: ");
+	gets(data[counter].name);
+	printf("Input surname: ");
+	gets(data[counter].surname);
+	printf("Input home adress: ");
+	gets(data[counter].homeAdress);
+	printf("Input 9 digits of phone number like 44*******: "); 
+	do
+	{
 		rewind(stdin);
-		printf("Record number %d of 30\n", counter+1);
-		printf("\nInput name: ");
-		gets(data[counter].name);
-		printf("Input surname: ");
-		gets(data[counter].surname);
-		printf("Input home adress: ");
-		gets(data[counter].homeAdress);
-		printf("Input 9 digits of phone number like 44*******: "); 
-		do
-		{
-			rewind(stdin);
-		} while (!scanf_s("%d", &(data + counter)->phoneNum));
-		printf("Input 4 digits of card number like 1234: ");
-		do
-		{
-			rewind(stdin);
-		} while (!scanf_s("%d", &(data + counter)->cardNum));
-		counter++;
-	}
-	else { 
-		printf("Maximum amount of data entered. Clean database!");
-		Sleep(500);
-	}
+	} while (!scanf_s("%d", &(data + counter)->phoneNum));
+	printf("Input 4 digits of card number like 1234: ");
+	do
+	{
+		rewind(stdin);
+	} while (!scanf_s("%d", &(data + counter)->cardNum));
+	counter++;
 }
 
-void outputData(struct customer data[], int counter) {
+void outputData(struct customer *data, int counter) {
 	system("CLS");
 	int outputSwitch;
 	int structNumber;
@@ -113,7 +108,7 @@ void outputData(struct customer data[], int counter) {
 	}
 	else {
 		printf("Please, Enter\n");
-		printf("1 - to see only one record.\n");
+		printf("1 - to see only one record of %d records.\n", counter+1);
 		printf("2 - to see all records.\n");
 		printf("99 - to main menu.\n");
 		printf("Input: ");
@@ -138,7 +133,7 @@ void outputData(struct customer data[], int counter) {
 			printf("\nName: %s\n", data[structNumber - 1].name);
 			printf("Surname: %s\n", data[structNumber - 1].surname);
 			printf("Home adress: %s\n", data[structNumber - 1].homeAdress);
-			printf("Phone: +375%d\n", data[structNumber - 1].phoneNum);
+			printf("Phone: 80%d\n", data[structNumber - 1].phoneNum);
 			printf("Card number: %d\n", data[structNumber - 1].cardNum);
 			printf("\nPlease, Enter\n");
 			printf("1 - Output menu\n");
@@ -153,10 +148,10 @@ void outputData(struct customer data[], int counter) {
 		}
 		if (outputSwitch == 2) {
 			system("CLS");
-			printf("|id. Name-Surname-Home adress-Phone-Card|\n\n");
+			printf("|!| Name | Surname | Home adress | Phone | Card |\n");
 			for (int i = 0; i < counter; i++) {
-				printf("|%d . %s-%s-%s", i+1, data[i].name, data[i].surname, data[i].homeAdress);
-				printf("-80%d-%d|\n", data[i].phoneNum, data[i].cardNum);
+				//printf("|%d| \t%s\t| \t%s\t| \t%s\t", i+1, data[i].name, data[i].surname, data[i].homeAdress);
+				//printf("| \t80%d\t | \t%d\t |\n", data[i].phoneNum, data[i].cardNum);
 			}
 			printf("\nPlease, Enter\n");
 			printf("1 - Output menu\n");
@@ -172,7 +167,7 @@ void outputData(struct customer data[], int counter) {
 	}
 }
 
-int deleteData(struct customer data[], int counter) {
+int deleteData(struct customer *data, int counter) {
 	system("CLS");
 	if (counter == 0) {
 		printf("No records. Please, input data!");
@@ -182,22 +177,22 @@ int deleteData(struct customer data[], int counter) {
 		int structNumber;
 		int confirmation;
 		printf("Please, Enter\n");
-		printf("Enter 1-30 record you want delete\n");
-		printf("Enter '99' - if you want delete all Data\n");
-		printf("Enter '100' - to main menu\n");
+		printf("Enter number of %d records you want delete\n",counter);
+		printf("Enter '-1' - if you want delete all Data\n");
+		printf("Enter '-2' - to main menu\n");
 		printf("Input: ");
 		do
 		{
 			rewind(stdin);
 		} while (!scanf_s("%d", &structNumber));
-		if (structNumber == 100) return counter;
-		if (structNumber > counter && structNumber != 99) {
+		if (structNumber == -2) return counter;
+		if (structNumber > counter && structNumber != -1 && structNumber < -2) {
 			system("CLS");
 			printf("Error! Please, input correct data.");
 			Sleep(1000);
 			return counter;
 		}
-		if (structNumber != 99) {
+		if (structNumber != -1) {
 			system("CLS");
 			printf("You really want delete this record?\n");
 			printf("%s-%s-%s", data[structNumber - 1].name, data[structNumber - 1].surname, data[structNumber - 1].homeAdress);
@@ -214,7 +209,7 @@ int deleteData(struct customer data[], int counter) {
 				return counter;
 			}
 		}
-		if (structNumber == 99) {
+		if (structNumber == -1) {
 			system("CLS");
 			printf("You really want delete all data?\n");
 			printf("1 - Yes\n");
@@ -223,7 +218,7 @@ int deleteData(struct customer data[], int counter) {
 			scanf_s("%d", &confirmation);
 			struct customer tmp = data[counter+1];
 			if (confirmation == 1) {
-				for (int i = 0; i < 30; i++) {
+				for (int i = 0; i < counter; i++) {
 					data[i] = tmp;
 				}
 				return counter = 0;
@@ -234,7 +229,7 @@ int deleteData(struct customer data[], int counter) {
 	}
 }
 
-void changeData(struct customer data[], int counter) {
+void changeData(struct customer *data, int counter) {
 	system("CLS");
 	if (counter == 0) {
 		printf("No records. Please, input data!");
@@ -301,7 +296,7 @@ void changeData(struct customer data[], int counter) {
 	}
 }
 
-void sortData(struct customer data[], int counter) {
+void sortData(struct customer *data, int counter) {
 	int switcher;
 	struct customer temp;
 	system("CLS");
@@ -387,7 +382,7 @@ void sortData(struct customer data[], int counter) {
 	}
 }
 
-void findData(struct customer data[], int counter) {
+void findData(struct customer *data, int counter) {
 	system("CLS");
 	int i ,switcher;
 	int flag = 0;
