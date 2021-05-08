@@ -1,5 +1,3 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -207,7 +205,7 @@ employee* del_any(employee* enter) {
 	return enter;
 }
 
-void find(employee* enter) { // функция поиска элемента по параметру в очереди
+void find(employee* enter) { // функция поиска элемента по параметру в кольце
 	employee* begin;
 	char switcher;
 	char symbols[30] = "";
